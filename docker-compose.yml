@@ -1,0 +1,32 @@
+# Set environment variables in .env or named env file.
+# https://docs.docker.com/compose/env-file/
+#
+# -------------------------------------------------------------------------------
+# Get access to a bash shell on the database container:
+# docker exec -it pgsearch bash
+# -------------------------------------------------------------------------------
+---
+services:
+  db:
+    container_name: pgsearch
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: dbhero
+    stdin_open: true
+    tty: true
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  data:

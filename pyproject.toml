@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "pg-search"
+version = "0.1.0"
+description = "A playground for learning PostgreSQL full text search"
+authors = ["Jon Stefansson <jonstef1667@gmail.com>"]
+readme = "README.md"
+packages = [{include = "pg_search", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+psycopg = {extras = ["binary"], version = "^3.1.18"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
