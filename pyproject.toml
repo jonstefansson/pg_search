@@ -11,8 +11,15 @@ python = "^3.12"
 psycopg = {extras = ["binary"], version = "^3.1.18"}
 click = "^8.1.7"
 jinja2 = "^3.1.3"
+tabulate = "^0.9.0"
+pyyaml = "^6.0.1"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+db = 'pg_search.commands.db:db_cli'
+tools = 'pg_search.commands.tools:tools_cli'
+yml = 'pg_search.commands.yml:yml_cli'
