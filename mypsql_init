@@ -1,0 +1,5 @@
+# source this to create the mypsql function
+
+mypsql () {
+	/opt/homebrew/opt/libpq/bin/psql --host=localhost --port=5432 --dbname=pgsearch --username=boston "$@"
+}
