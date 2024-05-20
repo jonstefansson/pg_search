@@ -1,27 +1,43 @@
+import logging
 import click
 from pg_search.services.yaml_loader import load_yaml
 from pg_search.database import DatabaseConnection
+from pg_search.models import Book
 
 
 @click.group()
-def db_cli():
-    pass
+@click.pass_context
+def db_cli(ctx):
+    ctx.ensure_object(dict)
+    db = DatabaseConnection('postgresql://boston@localhost/pgsearch')
+    ctx.obj['db'] = db
+
+    @ctx.call_on_close
+    def close_connection():
+        db.get_connection().close()
+        logging.getLogger('pg_search.db').info('database connection closed')
 
 
 @db_cli.command('authors')
-def authors():
-    db = DatabaseConnection('postgresql://boston@localhost/pgsearch')
-    with db.get_connection() as conn:
-        cur = conn.execute("""\
+@click.pass_context
+def authors(ctx):
+    db = ctx.obj['db']
+    cur = db.get_connection().execute(
+        """
         SELECT author_id, name_last, name_first
         FROM authors
-        """)
-        for record in cur:
-            click.echo(record)
+        """
+    )
+    for record in cur:
+        click.echo(record)
 
 
 @db_cli.command('insert-book')
 @click.argument('yml_input', required=True, type=click.File('r'))
-def insert_book(yml_input):
+@click.pass_context
+def insert_book(ctx, yml_input):
     data_dict = load_yaml(yml_input)
-    click.echo(data_dict)
+    result = Book.insert_book(ctx, data_dict)
+    logging.getLogger('pg_search.commands.db').info(f"result: {result}")
+    ctx.obj['db'].get_connection().commit()
+    logging.getLogger('pg_search.db').info('transaction committed')

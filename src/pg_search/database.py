@@ -1,3 +1,4 @@
+import logging
 import psycopg
 
 """
@@ -37,6 +38,7 @@ class DatabaseConnection(metaclass=SingletonMeta):
     def __init__(self, db_url):
         if self._connection is None:
             self._connection = psycopg.connect(db_url)
+            logging.getLogger('pg_search.database').debug('connected to %s', db_url)
 
     def get_connection(self):
         return self._connection
