@@ -7,6 +7,7 @@ from pg_search.models.author import Author
 class Book:
     book_id: int
     title: str
+    title_full: str
     tags: list[str]
     series_rank: int = 0
     year: int = 0
@@ -16,6 +17,7 @@ class Book:
         return cls(
             book_id=data['book_id'],
             title=data['title'],
+            title_full=data['title_full'],
             tags=data['tags'],
             series_rank=data['series_rank'],
             year=data['year']
@@ -48,7 +50,7 @@ class Book:
         conn = db.get_connection()
         cur = conn.execute(
             """
-            SELECT book_id, title, tags, series_rank
+            SELECT book_id, title, title_full, tags, series_rank
             FROM books
             WHERE title = %s AND year = %s;
             """,
@@ -60,14 +62,14 @@ class Book:
         else:
             cur = conn.execute(
                 """
-                INSERT INTO books (title, tags, series_rank, year)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO books (title, title_full, tags, series_rank, year)
+                VALUES (%s, %s, %s, %s, %s)
                 RETURNING book_id
                 """,
-                (book.title, book.tags, book.series_rank, book.year)
+                (book.title, book.title_full, book.tags, book.series_rank, book.year)
             )
             book_id = cur.fetchone()[0]
-        return cls(book_id, book.title, book.tags, book.series_rank)
+        return cls(book_id, book.title, book.title_full, book.tags, book.series_rank)
 
     @staticmethod
     def insert_book(ctx, data_dict):

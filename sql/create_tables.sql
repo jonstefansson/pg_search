@@ -3,6 +3,7 @@ CREATE TABLE books (
     series_rank INTEGER DEFAULT 0,
     tags text[],
     title text NOT NULL,
+    title_full text,
     year INTEGER NOT NULL DEFAULT 0
 );
 
