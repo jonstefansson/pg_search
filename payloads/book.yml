@@ -1,0 +1,28 @@
+# finished
+# reading    
+# aborted    
+# purchased  
+# pre-ordered
+# wished-for 
+---
+- book:
+    book_id:
+    title: >-
+      Bomber
+    title_full: >-
+    tags:
+      - Nonfiction
+      - Politics
+      - Joe Biden
+    series_rank:
+    year: 2024
+  author:
+    author_id:
+    name_first: Len
+    name_last: Deighton
+    year: 1974
+  event:
+    event_id:
+    book_id:
+    event: finished
+    created_at: 2024-04-01 10:00:00.000000
