@@ -1,4 +1,4 @@
 {# Emits a list of placeholders for an IN () query clause#}
 {% macro in_placeholders(cardinality) -%}
-    ({% for i in range(cardinality) %}{{'?'}}{{ ", " if not loop.last else "" }}{% endfor %})
+    ({% for i in range(cardinality) %}{{'%s'}}{{ ", " if not loop.last else "" }}{% endfor %})
 {%- endmacro %}
