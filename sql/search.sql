@@ -1,7 +1,7 @@
 -- -----------------------------------------------------------------------------
 -- https://www.postgresql.org/docs/16/textsearch-tables.html#TEXTSEARCH-TABLES-SEARCH
 -- 
--- Need to figure out how to search text[] column.
+-- Need to figure out how to search text[] column. (ANSWER: use array_to_string function)
 -- ERROR:  function to_tsvector(unknown, text[]) does not exist
 -- LINE 3: WHERE to_tsvector('english', tags) @@ to_tsquery('english', ...
 -- 
@@ -15,7 +15,7 @@ WHERE to_tsvector('english', title) @@ to_tsquery('english', 'Demon');
 
 SELECT title
 FROM books
-WHERE to_tsvector(title || ' ' || body) @@ to_tsquery('create & table')
+WHERE to_tsvector(title || ' ' || array_to_string(tags, ' ')) @@ to_tsquery('create & table')
 ORDER BY last_mod_date DESC
 LIMIT 10;
 
