@@ -23,12 +23,13 @@ def db_cli(ctx):
 
 @db_cli.command('find-book')
 @click.pass_context
-@click.argument('book_id', required=True, type=int)
+@click.argument('book_id', required=True, type=click.INT)
 def find_book_by_id(ctx, book_id):
     """
     Finds a book by its book_id.
-    :param ctx:
-    :param book_id:
+
+    :param ctx: dict -- the click context
+    :param book_id: int -- the book_id
     :return:
     """
     book = Book.find_by_id(ctx, book_id)
@@ -44,18 +45,18 @@ def authors(ctx):
     """
     Lists authors in the database.
 
-    :param ctx:
+    :param ctx: dict -- the click context
     :return:
     """
-    db = ctx.obj['db']
-    cur = db.get_connection().execute(
-        """
-        SELECT author_id, name_last, name_first
-        FROM authors
-        """
-    )
-    for record in cur:
-        click.echo(record)
+    with ctx.obj['db'].get_connection() as conn:
+        with conn.execute(
+            """
+            SELECT author_id, name_last, name_first
+            FROM authors
+            """
+        ) as cur:
+            for record in cur:
+                click.echo(record)
 
 
 @db_cli.command('insert-books')
@@ -64,6 +65,7 @@ def authors(ctx):
 def insert_books(ctx, yml_input):
     """
     Inserts one or more books in yml_input in the form of payloads/book.yml.
+
     :param ctx:
     :param yml_input:
     :return:
@@ -81,6 +83,9 @@ def insert_books(ctx, yml_input):
 def prepare(yml_input):
     """
     This function takes a flat yaml file containing book data and emits structured yaml for use by insert_books.
+
+    DEPRECATED?
+
     :param yml_input:
     :return:
     """
@@ -101,6 +106,13 @@ def prepare(yml_input):
 @click.option("-i", "--id", "book_id", help="The book_id", type=click.INT)
 @click.pass_context
 def build_searchable(ctx, book_id):
+    """
+    Updates the searchable column for a book.
+
+    :param ctx: dict -- the click context
+    :param book_id: int -- the book_id
+    :return:
+    """
     Book.update_searchable(ctx, book_id)
     click.echo(f"Updated searchable column for Book {book_id}", err=True)
 
@@ -108,12 +120,17 @@ def build_searchable(ctx, book_id):
 @db_cli.command('reindex')
 @click.pass_context
 def reindex(ctx):
-    db = ctx.obj['db']
-    conn = db.get_connection()
-    conn.execute(
-        get_template('reindex.sql').render()
-    )
-    click.secho('Rebuilt idx_searchable_book', err=True, fg='green')
+    """
+    Rebuilds the idx_searchable_book index.
+
+    :param ctx: dict -- the click context
+    :return:
+    """
+    with ctx.obj['db'].get_connection() as conn:
+        conn.execute(
+            get_template('reindex.sql').render()
+        )
+    click.secho('Reindexed idx_searchable_book', err=True, fg='green')
 
 
 @db_cli.command('add-event')
@@ -122,6 +139,15 @@ def reindex(ctx):
 @click.option("-e", "--event", "event", help="The event enum", required=True, type=click.STRING)
 @click.option("-c", "--created_at", "created_at", help="The date (defaults to today)", required=False, type=click.STRING)
 def add_event(ctx, book_id, event, created_at):
+    """
+    Adds an event to the database.
+
+    :param ctx: dict -- the click context
+    :param book_id: int --
+    :param event: str -- the event enum
+    :param created_at: datetime -- the date of the event
+    :return:
+    """
     Event.find_or_create(
         ctx,
         event=Event.from_dict(
@@ -133,3 +159,26 @@ def add_event(ctx, book_id, event, created_at):
             )
         )
     )
+
+
+@db_cli.command('search')
+@click.argument('query', required=True, type=click.STRING)
+@click.pass_context
+def search(ctx, query):
+    """
+    Full-text search for books and authors.
+
+    :param ctx: dict -- the click context
+    :param query: str -- the search query
+    :return:
+    """
+    from tabulate import tabulate
+    book_tuples = [book_tuple for book_tuple in Book.search(ctx, query)]
+    click.echo(tabulate(book_tuples, headers=[
+        'book_id',
+        'title',
+        'year',
+        'series_rank',
+        'author',
+        'tags'
+    ]))

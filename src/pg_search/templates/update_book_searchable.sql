@@ -13,4 +13,4 @@ SET searchable = (
       GROUP BY book_authors.book_id
   )
 )
-WHERE book_id = %s;
+WHERE book_id = %(book_id)s;

@@ -8,23 +8,22 @@
 - book:
     book_id:
     title: >-
-      Challenger
+      When the Sea Came Alive
     title_full: >-
-      Challenger: A True Story of Heroism and Disaster on the Edge of Space
+      When the Sea Came Alive: An Oral History of D-Day
     tags:
       - NonFiction
-      - Space
-      - NASA
-      - Space Shuttle
+      - WWII
+      - History
     series_rank:
     year: 2024
   author:
-    author_id:
-    name_first: Adam
-    name_last: Higginbotham
-    year: 1968
+    author_id: 34
+    name_first: Garrett M.
+    name_last: Graff
+    year: 1981
   event:
     event_id:
     book_id:
     event: reading
-    created_at:
+    created_at: 2024-06-01

@@ -49,20 +49,20 @@ class Book:
     @classmethod
     def find_by_id(cls, ctx, book_id):
         from ..models import Author, Event
+        book = None
         template = get_template('book_find_by_id.sql')
         db = ctx.obj['db']
-        conn = db.get_connection()
-        cur = conn.execute(
-            template.render(),
-            (book_id,)
-        )
-        record = cur.fetchone()
-        if record:
-            book = cls(*record)
-            book.authors = Author.book_authors(ctx, book_id)
-            book.last_event = Event.last_event(ctx, book_id)
-            return book
-        return None
+        with db.get_connection() as conn:
+            with conn.execute(
+                template.render(),
+                (book_id,)
+            ) as cur:
+                record = cur.fetchone()
+                if record:
+                    book = cls(*record)
+                    book.authors = Author.book_authors(ctx, book_id)
+                    book.last_event = Event.last_event(ctx, book_id)
+        return book
 
     @classmethod
     def find_or_create(cls, ctx, book: 'Book') -> 'Book':
@@ -119,10 +119,28 @@ class Book:
         :return:
         """
         template = get_template('update_book_searchable.sql')
-        db = ctx.obj['db']
-        conn = db.get_connection()
-        conn.execute(
-            template.render(),
-            book_id
-        )
-        conn.commit()
+        with ctx.obj['db'].get_connection() as conn:
+            conn.execute(
+                template.render(),
+                dict(book_id=book_id)
+            )
+            conn.commit()
+
+    @staticmethod
+    def search(ctx, query):
+        """
+        Performs full-text search on books and authors.
+
+        :param ctx: dict -- the click context
+        :param query: str -- the search term
+        :return:
+        """
+        from ..models import Author
+        template = get_template('search.sql')
+        with ctx.obj['db'].get_connection() as conn:
+            with conn.execute(
+                template.render(),
+                dict(query=query)
+            ) as cur:
+                for record_tuple in cur:
+                    yield record_tuple

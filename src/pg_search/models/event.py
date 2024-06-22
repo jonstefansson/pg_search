@@ -54,8 +54,9 @@ class Event:
     def last_event(cls, ctx, book_id) -> 'Event':
         """
         Find the last event for a book.
-        :param ctx:
-        :param book_id:
+
+        :param ctx: dict -- the click context
+        :param book_id: int -- the book_id
         :return: Event
         """
         db = ctx.obj['db']

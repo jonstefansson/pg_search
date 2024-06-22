@@ -10,19 +10,28 @@
 -- -----------------------------------------------------------------------------
 SELECT book_id, title
 FROM books
-WHERE to_tsvector('english', title) @@ to_tsquery('english', 'Demon');
+WHERE books.searchable @@ to_tsquery('english', 'C.J. Box');
+-- ERROR:  syntax error in tsquery: "C.J. Box"
 
-
-SELECT title
+SELECT book_id, title
 FROM books
-WHERE to_tsvector(title || ' ' || array_to_string(tags, ' ')) @@ to_tsquery('create & table')
-ORDER BY last_mod_date DESC
-LIMIT 10;
+WHERE books.searchable @@ plainto_tsquery('english', 'C.J. Box');
+-- Works
 
-SELECT books.title || ' ' || books.title_full
+SELECT book_id, title
 FROM books
-JOIN book_authors ON books.book_id = book_authors
+WHERE books.searchable @@ phraseto_tsquery('english', 'C.J. Box');
+-- Works
 
+SELECT books.book_id,
+       books.title,
+       string_agg((authors.name_last || ', ' || authors.name_first), ', ') as author
+FROM books
+LEFT JOIN book_authors ON books.book_id = book_authors.book_id
+LEFT JOIN authors ON book_authors.author_id = authors.author_id
+WHERE books.searchable @@ websearch_to_tsquery('english', 'Box OR Connelly')
+GROUP BY authors.author_id, books.book_id
+ORDER BY authors.author_id;
 
 -- -----------------------------------------------------------------------------
 -- https://dba.stackexchange.com/questions/107801/full-text-search-on-multiple-joined-tables
