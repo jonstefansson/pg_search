@@ -8,23 +8,23 @@
 - book:
     book_id:
     title: >-
-      The War Below
+      Challenger
     title_full: >-
+      Challenger: A True Story of Heroism and Disaster on the Edge of Space
     tags:
       - NonFiction
-      - World War II
-      - History
-      - Naval
-      - Submarines
+      - Space
+      - NASA
+      - Space Shuttle
     series_rank:
-    year: 2012
+    year: 2024
   author:
     author_id:
-    name_first: James
-    name_last: Scott
-    year: 0
+    name_first: Adam
+    name_last: Higginbotham
+    year: 1968
   event:
     event_id:
     book_id:
-    event: finished
-    created_at: 2023-10-01 12:00:00.000000
+    event: reading
+    created_at:

@@ -1,0 +1,1 @@
+REINDEX INDEX idx_searchable_book;

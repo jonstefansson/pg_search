@@ -1,6 +1,6 @@
 import logging
-from dataclasses import dataclass
-from pg_search.models.author import Author
+from dataclasses import dataclass, field
+from ..support import get_template
 
 
 @dataclass
@@ -9,6 +9,8 @@ class Book:
     title: str
     title_full: str
     tags: list[str]
+    authors: list['Author'] = field(default_factory=list)
+    last_event: 'Event' = None
     series_rank: int = 0
     year: int = 0
 
@@ -45,6 +47,24 @@ class Book:
             )
 
     @classmethod
+    def find_by_id(cls, ctx, book_id):
+        from ..models import Author, Event
+        template = get_template('book_find_by_id.sql')
+        db = ctx.obj['db']
+        conn = db.get_connection()
+        cur = conn.execute(
+            template.render(),
+            (book_id,)
+        )
+        record = cur.fetchone()
+        if record:
+            book = cls(*record)
+            book.authors = Author.book_authors(ctx, book_id)
+            book.last_event = Event.last_event(ctx, book_id)
+            return book
+        return None
+
+    @classmethod
     def find_or_create(cls, ctx, book: 'Book') -> 'Book':
         db = ctx.obj['db']
         conn = db.get_connection()
@@ -73,6 +93,12 @@ class Book:
 
     @staticmethod
     def insert_book(ctx, data_dict):
+        """
+        Inserts a book into the database.
+        :param ctx:
+        :param data_dict: See payloads/book.yml for structure
+        :return:
+        """
         from pg_search.models import Author, Book, Event
         logging.getLogger('pg_search.models.book').info(f"insert_book -- data_dict: {data_dict}")
         author = Author.find_or_create(ctx, data_dict['author'])
@@ -80,5 +106,23 @@ class Book:
         book = Book.find_or_create(ctx, data_dict['book'])
         data_dict['book'] = book
         book.associate_author(ctx, author)
-        event = Event.find_or_create(ctx, data_dict['event'], book)
+        data_dict['event'].book_id = book.book_id
+        event = Event.find_or_create(ctx, data_dict['event'])
         return dict(author=author, book=book, event=event)
+
+    @staticmethod
+    def update_searchable(ctx, book_id):
+        """
+        Updates the searchable column of the books table. Remember to reindex the searchable index after making a change.
+        :param ctx:
+        :param book_id:
+        :return:
+        """
+        template = get_template('update_book_searchable.sql')
+        db = ctx.obj['db']
+        conn = db.get_connection()
+        conn.execute(
+            template.render(),
+            book_id
+        )
+        conn.commit()

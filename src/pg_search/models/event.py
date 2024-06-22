@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime
 from pg_search.support.date import safe_parse, current_timestamp_callable
-from pg_search.models import Book
+from ..support import get_template
 
 
 @dataclass
@@ -22,29 +22,21 @@ class Event:
         )
 
     @classmethod
-    def find_or_create(cls, ctx, event: 'Event', book: 'Book') -> 'Event':
+    def find_or_create(cls, ctx, event: 'Event') -> 'Event':
         db = ctx.obj['db']
         conn = db.get_connection()
         cur = conn.execute(
-            """
-            SELECT event_id, book_id, event, created_at
-            FROM events
-            WHERE book_id = %s AND event = %s;
-            """,
-            (book.book_id, event.event)
+            get_template('event_find.sql').render(),
+            (event.book_id, event.event)
         )
         record = cur.fetchone()
         if record:
             return cls(*record)
 
         cur = conn.execute(
-            """
-            INSERT INTO events (book_id, event, created_at)
-            VALUES (%s, %s, %s)
-            RETURNING event_id, book_id
-            """,
+            get_template('event_insert.sql').render(),
             (
-                book.book_id,
+                event.book_id,
                 event.event,
                 safe_parse(
                     date_expression=event.created_at,
@@ -53,6 +45,25 @@ class Event:
             )
         )
         event_id, book_id = cur.fetchone()
+        conn.commit()
 
         logging.getLogger('pg_search.models.event').info(f"insert event -- event_id: {event_id}")
         return cls(event_id, book_id, event.event, event.created_at)
+
+    @classmethod
+    def last_event(cls, ctx, book_id) -> 'Event':
+        """
+        Find the last event for a book.
+        :param ctx:
+        :param book_id:
+        :return: Event
+        """
+        db = ctx.obj['db']
+        conn = db.get_connection()
+        cur = conn.execute(
+            get_template('event_last.sql').render(),
+            (book_id,)
+        )
+        record = cur.fetchone()
+        if record:
+            return cls(*record)

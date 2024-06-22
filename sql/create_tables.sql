@@ -4,10 +4,12 @@ CREATE TABLE books (
     tags text[],
     title text NOT NULL,
     title_full text,
-    year INTEGER NOT NULL DEFAULT 0
+    year INTEGER NOT NULL DEFAULT 0,
+    searchable tsvector
 );
 
 CREATE UNIQUE INDEX index_book_titles ON books (title, year);
+CREATE INDEX idx_searchable_book ON books USING GIN(searchable);
 
 CREATE TABLE authors (
     author_id SERIAL PRIMARY KEY,
