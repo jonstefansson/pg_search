@@ -23,17 +23,16 @@ class Event:
 
     @classmethod
     def find_or_create(cls, ctx, event: 'Event') -> 'Event':
-        db = ctx.obj['db']
-        conn = db.get_connection()
-        cur = conn.execute(
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
             get_template('event_find.sql').render(),
             (event.book_id, event.event)
-        )
-        record = cur.fetchone()
-        if record:
-            return cls(*record)
+        ) as cur:
+            record = cur.fetchone()
+            if record:
+                return cls(*record)
 
-        cur = conn.execute(
+        with conn.execute(
             get_template('event_insert.sql').render(),
             (
                 event.book_id,
@@ -43,8 +42,8 @@ class Event:
                     default=current_timestamp_callable
                 )
             )
-        )
-        event_id, book_id = cur.fetchone()
+        ) as cur:
+            event_id, book_id = cur.fetchone()
         conn.commit()
 
         logging.getLogger('pg_search.models.event').info(f"insert event -- event_id: {event_id}")
@@ -59,12 +58,11 @@ class Event:
         :param book_id: int -- the book_id
         :return: Event
         """
-        db = ctx.obj['db']
-        conn = db.get_connection()
-        cur = conn.execute(
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
             get_template('event_last.sql').render(),
             (book_id,)
-        )
-        record = cur.fetchone()
-        if record:
-            return cls(*record)
+        ) as cur:
+            record = cur.fetchone()
+            if record:
+                return cls(*record)

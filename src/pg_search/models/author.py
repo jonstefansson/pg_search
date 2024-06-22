@@ -30,38 +30,37 @@ class Author:
         :param author:
         :return:
         """
-        db = ctx.obj['db']
-        conn = db.get_connection()
-        cur = conn.execute(
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
             """
             SELECT author_id, name_last, name_first, year
             FROM authors
             WHERE name_last = %s AND name_first = %s AND year = %s;
             """,
             (author.name_last, author.name_first, author.year)
-        )
-        record = cur.fetchone()
-        if record:
-            return cls(*record)
-        else:
-            cur = conn.execute(
-                """
-                INSERT INTO authors (name_last, name_first, year)
-                VALUES (%s, %s, %s)
-                RETURNING author_id
-                """,
-                (author.name_last, author.name_first, author.year)
-            )
-            author_id = cur.fetchone()[0]
-        return cls(author_id, author.name_last, author.name_first, author.year)
+        ) as cur:
+            record = cur.fetchone()
+            if record:
+                return cls(*record)
+            else:
+                cur = conn.execute(
+                    """
+                    INSERT INTO authors (name_last, name_first, year)
+                    VALUES (%s, %s, %s)
+                    RETURNING author_id
+                    """,
+                    (author.name_last, author.name_first, author.year)
+                )
+                author_id = cur.fetchone()[0]
+            return cls(author_id, author.name_last, author.name_first, author.year)
 
     @classmethod
     def book_authors(cls, ctx, book_id):
         template = get_template('book_authors.sql')
-        db = ctx.obj['db']
-        conn = db.get_connection()
-        cur = conn.execute(
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
             template.render(),
             (book_id,)
-        )
-        return [cls(*record) for record in cur]
+        ) as cur:
+            for record in cur:
+                yield cls(*record)

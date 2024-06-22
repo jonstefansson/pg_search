@@ -17,6 +17,11 @@ def db_cli(ctx):
 
     @ctx.call_on_close
     def close_connection():
+        """
+        Automatically closes the database connection when the command completes.
+
+        :return:
+        """
         db.get_connection().close()
         logging.getLogger('pg_search.db').info('database connection closed')
 
@@ -48,15 +53,15 @@ def authors(ctx):
     :param ctx: dict -- the click context
     :return:
     """
-    with ctx.obj['db'].get_connection() as conn:
-        with conn.execute(
-            """
-            SELECT author_id, name_last, name_first
-            FROM authors
-            """
-        ) as cur:
-            for record in cur:
-                click.echo(record)
+    conn = ctx.obj['db'].get_connection()
+    with conn.execute(
+        """
+        SELECT author_id, name_last, name_first
+        FROM authors
+        """
+    ) as cur:
+        for record in cur:
+            click.echo(record)
 
 
 @db_cli.command('insert-books')
@@ -126,10 +131,10 @@ def reindex(ctx):
     :param ctx: dict -- the click context
     :return:
     """
-    with ctx.obj['db'].get_connection() as conn:
-        conn.execute(
-            get_template('reindex.sql').render()
-        )
+    conn = ctx.obj['db'].get_connection()
+    conn.execute(
+        get_template('reindex.sql').render()
+    )
     click.secho('Reindexed idx_searchable_book', err=True, fg='green')
 
 

@@ -26,9 +26,8 @@ class Book:
         )
 
     def associate_author(self, ctx, author: 'Author'):
-        db = ctx.obj['db']
-        conn = db.get_connection()
-        cur = conn.execute(
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
             """
             SELECT EXISTS (
                 SELECT 1 FROM book_authors
@@ -36,60 +35,59 @@ class Book:
             ) 
             """,
             (self.book_id, author.author_id)
-        )
-        if not cur.fetchone()[0]:
-            conn.execute(
-                """
-                INSERT INTO book_authors (book_id, author_id)
-                VALUES (%s, %s);
-                """,
-                (self.book_id, author.author_id)
-            )
+        ) as cur:
+            if not cur.fetchone()[0]:
+                conn.execute(
+                    """
+                    INSERT INTO book_authors (book_id, author_id)
+                    VALUES (%s, %s);
+                    """,
+                    (self.book_id, author.author_id)
+                )
 
     @classmethod
     def find_by_id(cls, ctx, book_id):
         from ..models import Author, Event
         book = None
         template = get_template('book_find_by_id.sql')
-        db = ctx.obj['db']
-        with db.get_connection() as conn:
-            with conn.execute(
-                template.render(),
-                (book_id,)
-            ) as cur:
-                record = cur.fetchone()
-                if record:
-                    book = cls(*record)
-                    book.authors = Author.book_authors(ctx, book_id)
-                    book.last_event = Event.last_event(ctx, book_id)
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
+            template.render(),
+            (book_id,)
+        ) as cur:
+            record = cur.fetchone()
+            if record:
+                book = cls(*record)
+                book.authors = [author for author in Author.book_authors(ctx, book_id)]
+                book.last_event = Event.last_event(ctx, book_id)
         return book
 
     @classmethod
     def find_or_create(cls, ctx, book: 'Book') -> 'Book':
-        db = ctx.obj['db']
-        conn = db.get_connection()
-        cur = conn.execute(
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
             """
             SELECT book_id, title, title_full, tags, series_rank
             FROM books
             WHERE title = %s AND year = %s;
             """,
             (book.title, book.year)
-        )
-        record = cur.fetchone()
+        ) as cur:
+            record = cur.fetchone()
         if record:
             return cls(*record)
-        else:
-            cur = conn.execute(
-                """
-                INSERT INTO books (title, title_full, tags, series_rank, year)
-                VALUES (%s, %s, %s, %s, %s)
-                RETURNING book_id
-                """,
-                (book.title, book.title_full, book.tags, book.series_rank, book.year)
-            )
+        with conn.execute(
+            """
+            INSERT INTO books (title, title_full, tags, series_rank, year)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING book_id
+            """,
+            (book.title, book.title_full, book.tags, book.series_rank, book.year)
+        ) as cur:
             book_id = cur.fetchone()[0]
-        return cls(book_id, book.title, book.title_full, book.tags, book.series_rank)
+            book = cls(book_id, book.title, book.title_full, book.tags, book.series_rank)
+            conn.commit()
+            return book
 
     @staticmethod
     def insert_book(ctx, data_dict):
@@ -119,12 +117,12 @@ class Book:
         :return:
         """
         template = get_template('update_book_searchable.sql')
-        with ctx.obj['db'].get_connection() as conn:
-            conn.execute(
-                template.render(),
-                dict(book_id=book_id)
-            )
-            conn.commit()
+        conn = ctx.obj['db'].get_connection()
+        conn.execute(
+            template.render(),
+            dict(book_id=book_id)
+        )
+        conn.commit()
 
     @staticmethod
     def search(ctx, query):
@@ -135,12 +133,11 @@ class Book:
         :param query: str -- the search term
         :return:
         """
-        from ..models import Author
         template = get_template('search.sql')
-        with ctx.obj['db'].get_connection() as conn:
-            with conn.execute(
-                template.render(),
-                dict(query=query)
-            ) as cur:
-                for record_tuple in cur:
-                    yield record_tuple
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
+            template.render(),
+            dict(query=query)
+        ) as cur:
+            for record_tuple in cur:
+                yield record_tuple
