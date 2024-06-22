@@ -89,8 +89,6 @@ def prepare(yml_input):
     """
     This function takes a flat yaml file containing book data and emits structured yaml for use by insert_books.
 
-    DEPRECATED?
-
     :param yml_input:
     :return:
     """

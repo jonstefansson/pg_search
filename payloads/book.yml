@@ -8,22 +8,24 @@
 - book:
     book_id:
     title: >-
-      When the Sea Came Alive
+      The White Lady
     title_full: >-
-      When the Sea Came Alive: An Oral History of D-Day
     tags:
-      - NonFiction
+      - Fiction
+      - Mystery
+      - Historical
       - WWII
-      - History
-    series_rank:
+      - England
+      - Elinor White
+    series_rank: 1
     year: 2024
   author:
-    author_id: 34
-    name_first: Garrett M.
-    name_last: Graff
-    year: 1981
+    author_id: 14
+    name_first: Jacqueline
+    name_last: Winspear
+    year: 1955
   event:
     event_id:
     book_id:
-    event: reading
-    created_at: 2024-06-01
+    event: purchased
+    created_at:

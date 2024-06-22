@@ -12,4 +12,5 @@ SET searchable = (
       WHERE book_authors.book_id = books.book_id
       GROUP BY book_authors.book_id
   )
-);
+)
+;

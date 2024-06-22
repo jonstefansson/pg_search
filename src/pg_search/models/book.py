@@ -57,7 +57,14 @@ class Book:
         ) as cur:
             record = cur.fetchone()
             if record:
-                book = cls(*record)
+                book = cls(
+                    book_id=record[0],
+                    title=record[1],
+                    title_full=record[2],
+                    tags=record[3],
+                    series_rank=record[4],
+                    year=record[5]
+                )
                 book.authors = [author for author in Author.book_authors(ctx, book_id)]
                 book.last_event = Event.last_event(ctx, book_id)
         return book

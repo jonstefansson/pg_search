@@ -1,0 +1,6 @@
+poetry run db insert-books payloads/book.yml
+poetry run db search 'winspear'
+poetry run db find-book 129
+poetry run db build-searchable -i 130
+poetry run db reindex
+poetry run db prepare payloads/dobbs.yml > payloads/temp.yml
