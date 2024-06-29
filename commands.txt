@@ -10,7 +10,7 @@ poetry run db prepare payloads/dobbs.yml > payloads/temp.yml
 poetry run db book-status reading
 
 type mypsql
-declare -f mypsql
+declare -f mypsqlj
 
 pg_dump --host=localhost --username=boston --verbose --format=c pgsearch > backup.dump
 pg_restore --host=localhost --username=boston --verbose --clean --dbname=pgsearch backup.dump
