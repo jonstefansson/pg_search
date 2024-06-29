@@ -2,7 +2,7 @@ import logging
 import click
 import yaml
 from pg_search.services.yaml_loader import load_yaml
-from pg_search.database import DatabaseConnection
+from pg_search.database import DatabaseConnection, Query
 from ..models import Book, Event
 from ..support import get_template, safe_parse
 from dataclasses import asdict
@@ -185,3 +185,26 @@ def search(ctx, query):
         'author',
         'tags'
     ]))
+
+
+@db_cli.command('book-status')
+@click.argument('status', required=True, type=click.STRING)
+@click.pass_context
+def book_status(ctx, status):
+    from tabulate import tabulate
+    conn = ctx.obj['db'].get_connection()
+    query = Query(
+        template_name='books_with_status.sql',
+        template_params=dict(),
+        query_params=dict(status=status),
+        fetch_one=False,
+    )
+    results = query.execute(conn)
+    click.echo(
+        tabulate(results, headers=[
+            'book_id',
+            'title',
+            'authors',
+            'status',
+            'created_at'
+        ]))

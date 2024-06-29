@@ -1,5 +1,7 @@
 import logging
 import psycopg
+from dataclasses import dataclass, field
+from typing import Dict, Any, Optional
 
 """
 Creating a singleton database connection in Python involves creating a class that ensures only a single instance
@@ -42,3 +44,25 @@ class DatabaseConnection(metaclass=SingletonMeta):
 
     def get_connection(self):
         return self._connection
+
+
+@dataclass
+class Query:
+    template_name: str
+    template_params: Dict[str, Any]
+    query_params: Optional[Dict[str, Any]]
+    fetch_one: bool = field(init=True, default=False)
+
+    def execute(self, conn):
+        """
+        param: conn: the database connection
+        """
+        from .support.template import get_template
+        with conn.execute(
+            get_template(self.template_name).render(self.template_params),
+            self.query_params
+        ) as cur:
+            if self.fetch_one:
+                return cur.fetchone()
+            else:
+                return cur.fetchall()

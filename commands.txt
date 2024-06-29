@@ -1,6 +1,16 @@
 poetry run db insert-books payloads/book.yml
 poetry run db search 'winspear'
-poetry run db find-book 129
+poetry run db search 'winspear -dobbs'
+poetry run db search '"winspear jacqueline" -"Maisie Dobbs"'
+poetry run db find-book 128
 poetry run db build-searchable -i 130
+poetry run db add-event -i 128 -e 'finished' -c '2024-06-23'
 poetry run db reindex
 poetry run db prepare payloads/dobbs.yml > payloads/temp.yml
+poetry run db book-status reading
+
+type mypsql
+declare -f mypsql
+
+pg_dump --host=localhost --username=boston --verbose --format=c pgsearch > backup.dump
+pg_restore --host=localhost --username=boston --verbose --clean --dbname=pgsearch backup.dump
