@@ -3,7 +3,7 @@ import click
 import yaml
 from pg_search.services.yaml_loader import load_yaml
 from pg_search.database import DatabaseConnection, Query
-from ..models import Book, Event
+from ..models import Book, Event, EventEnum
 from ..support import get_template, safe_parse
 from dataclasses import asdict
 
@@ -139,7 +139,7 @@ def reindex(ctx):
 @db_cli.command('add-event')
 @click.pass_context
 @click.option("-i", "--id", "book_id", help="The book_id", required=True, type=click.INT)
-@click.option("-e", "--event", "event", help="The event enum", required=True, type=click.STRING)
+@click.option("-e", "--event", "event", help="The event enum", required=True, type=click.Choice([str(i) for i in EventEnum]))
 @click.option("-c", "--created_at", "created_at", help="The date (defaults to today)", required=False, type=click.STRING)
 def add_event(ctx, book_id, event, created_at):
     """
@@ -188,7 +188,7 @@ def search(ctx, query):
 
 
 @db_cli.command('book-status')
-@click.argument('status', required=True, type=click.STRING)
+@click.argument('status', required=True, type=click.Choice([str(i) for i in EventEnum]))
 @click.pass_context
 def book_status(ctx, status):
     from tabulate import tabulate
@@ -197,7 +197,7 @@ def book_status(ctx, status):
         template_name='books_with_status.sql',
         template_params=dict(),
         query_params=dict(status=status),
-        fetch_one=False,
+        fetch_one=False
     )
     results = query.execute(conn)
     click.echo(

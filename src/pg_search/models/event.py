@@ -1,8 +1,18 @@
 import logging
+from enum import StrEnum
 from dataclasses import dataclass
 from datetime import datetime
 from pg_search.support.date import safe_parse, current_timestamp_callable
 from ..support import get_template
+
+
+class EventEnum(StrEnum):
+    READING = 'reading'
+    FINISHED = 'finished'
+    PURCHASED = 'purchased'
+    ABORTED = 'aborted'
+    PRE_ORDERED = 'pre-ordered'
+    WISHED_FOR = 'wished-for'
 
 
 @dataclass
