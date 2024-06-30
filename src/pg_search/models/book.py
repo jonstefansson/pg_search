@@ -1,5 +1,5 @@
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from ..support import get_template
 
 
@@ -106,14 +106,15 @@ class Book:
         """
         from pg_search.models import Author, Book, Event
         logging.getLogger('pg_search.models.book').info(f"insert_book -- data_dict: {data_dict}")
-        author = Author.find_or_create(ctx, data_dict['author'])
-        data_dict['author'] = author
+        authors = [Author.find_or_create(ctx, author) for author in data_dict['authors']]
+        data_dict['authors'] = authors
         book = Book.find_or_create(ctx, data_dict['book'])
         data_dict['book'] = book
-        book.associate_author(ctx, author)
+        for author in authors:
+            book.associate_author(ctx, author)
         data_dict['event'].book_id = book.book_id
         event = Event.find_or_create(ctx, data_dict['event'])
-        return dict(author=author, book=book, event=event)
+        return dict(authors=[asdict(a) for a in authors], book=asdict(book), event=asdict(event))
 
     @staticmethod
     def update_searchable(ctx, book_id):

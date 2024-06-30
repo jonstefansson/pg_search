@@ -78,9 +78,9 @@ def insert_books(ctx, yml_input):
     books = load_yaml(yml_input)
     for data_dict in books:
         result = Book.insert_book(ctx, data_dict)
-        logging.getLogger('pg_search.commands.db').info(f"result: {result}")
         ctx.obj['db'].get_connection().commit()
         logging.getLogger('pg_search.db').info('transaction committed')
+        click.echo(yaml.dump(result))
 
 
 @db_cli.command('prepare')
@@ -106,7 +106,7 @@ def prepare(yml_input):
 
 
 @db_cli.command('build-searchable')
-@click.option("-i", "--id", "book_id", help="The book_id", type=click.INT)
+@click.argument("book_id", type=click.INT)
 @click.pass_context
 def build_searchable(ctx, book_id):
     """

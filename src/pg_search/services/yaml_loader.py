@@ -9,7 +9,7 @@ def load_yaml(input_stream):
     return [
         dict(
             book=Book.from_dict(data['book']),
-            author=Author.from_dict(data['author']),
+            authors=[Author.from_dict(author) for author in data['authors']],
             event=Event.from_dict(data['event'])
         )
         for data in data_list

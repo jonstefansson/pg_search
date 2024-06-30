@@ -8,24 +8,22 @@
 - book:
     book_id:
     title: >-
-      The White Lady
+      My Darkest Prayer
     title_full: >-
+      My Darkest Prayer
     tags:
       - Fiction
       - Mystery
-      - Historical
-      - WWII
-      - England
-      - Elinor White
-    series_rank: 1
-    year: 2024
-  author:
-    author_id: 14
-    name_first: Jacqueline
-    name_last: Winspear
-    year: 1955
+      - Thriller
+    series_rank:
+    year: 2019
+  authors:
+    - author_id:
+      name_first: S.A.
+      name_last: Cosby
+      year: 1973
   event:
     event_id:
     book_id:
-    event: purchased
-    created_at:
+    event: finished
+    created_at: 2020-07-06T12:00:00
