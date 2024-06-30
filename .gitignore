@@ -1,4 +1,4 @@
 .idea/
 **/__pycache__/
-backup.dump
 payloads/temp.yml
+pg_search_backup.dump
