@@ -114,6 +114,7 @@ class Book:
             book.associate_author(ctx, author)
         data_dict['event'].book_id = book.book_id
         event = Event.find_or_create(ctx, data_dict['event'])
+        Book.update_searchable(ctx, book.book_id)
         return dict(authors=[asdict(a) for a in authors], book=asdict(book), event=asdict(event))
 
     @staticmethod
