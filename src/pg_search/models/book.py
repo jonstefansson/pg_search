@@ -134,18 +134,19 @@ class Book:
         conn.commit()
 
     @staticmethod
-    def search(ctx, query):
+    def search(ctx, query, query_parser):
         """
         Performs full-text search on books and authors.
 
         :param ctx: dict -- the click context
         :param query: str -- the search term
+        :param query_parser: str -- the query parser to use
         :return:
         """
         template = get_template('search.sql')
         conn = ctx.obj['db'].get_connection()
         with conn.execute(
-            template.render(),
+            template.render(query_parser=query_parser),
             dict(query=query)
         ) as cur:
             for record_tuple in cur:

@@ -165,18 +165,35 @@ def add_event(ctx, book_id, event, created_at):
 
 
 @db_cli.command('search')
+@click.option(
+    '-p',
+    '--query-parser',
+    'query_parser',
+    help='The query parser to use',
+    required=False,
+    default='websearch_to_tsquery',
+    type=click.Choice(
+        [
+            'to_tsquery',
+            'plainto_tsquery',
+            'phraseto_tsquery',
+            'websearch_to_tsquery'
+        ]
+    )
+)
 @click.argument('query', required=True, type=click.STRING)
 @click.pass_context
-def search(ctx, query):
+def search(ctx, query, query_parser):
     """
     Full-text search for books and authors.
 
     :param ctx: dict -- the click context
     :param query: str -- the search query
+    :param query_parser: str -- the query parser
     :return:
     """
     from tabulate import tabulate
-    book_tuples = [book_tuple for book_tuple in Book.search(ctx, query)]
+    book_tuples = [book_tuple for book_tuple in Book.search(ctx, query, query_parser)]
     click.echo(tabulate(book_tuples, headers=[
         'book_id',
         'title',
