@@ -162,6 +162,7 @@ def add_event(ctx, book_id, event, created_at):
             )
         )
     )
+    Book.update_status(ctx, book_id, event)
 
 
 @db_cli.command('search')
@@ -208,6 +209,13 @@ def search(ctx, query, query_parser):
 @click.argument('status', required=True, type=click.Choice([str(i) for i in EventEnum]))
 @click.pass_context
 def book_status(ctx, status):
+    """
+    Lists books with status pass as argument.
+
+    :param ctx:
+    :param status:
+    :return:
+    """
     from tabulate import tabulate
     conn = ctx.obj['db'].get_connection()
     query = Query(

@@ -4,7 +4,15 @@ The purpose of this project is to experiment with PostgreSQL full-text search. I
 
 ## Commands
 
-* poetry run db insert-books payloads/book.yml
+* db add-event         Adds an event to the database.
+* db authors           Lists authors in the database.
+* db book-status       Lists books with status pass as argument
+* db build-searchable  Updates the searchable column for a book.
+* db find-book         Finds a book by its book_id.
+* db insert-books      Inserts one or more books in yml_input in the form of...
+* db prepare           This function takes a flat yaml file containing book...
+* db reindex           Rebuilds the idx_searchable_book index.
+* db search            Full-text search for books and authors.
 
 ## Optimizing Full-Text Search 
 

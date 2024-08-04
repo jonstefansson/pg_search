@@ -1,3 +1,8 @@
+CREATE TYPE event_type AS ENUM (
+    'finished', 'reading', 'aborted', 'purchased',
+    'pre-ordered', 'wished-for'
+);
+
 CREATE TABLE books (
     book_id SERIAL PRIMARY KEY,
     series_rank INTEGER DEFAULT 0,
@@ -5,11 +10,13 @@ CREATE TABLE books (
     title text NOT NULL,
     title_full text,
     year INTEGER NOT NULL DEFAULT 0,
+    status event_type NULL,
     searchable tsvector
 );
 
 CREATE UNIQUE INDEX index_book_titles ON books (title, year);
 CREATE INDEX idx_searchable_book ON books USING GIN(searchable);
+CREATE INDEX idx_status ON books (status);
 
 CREATE TABLE authors (
     author_id SERIAL PRIMARY KEY,
@@ -19,11 +26,6 @@ CREATE TABLE authors (
 );
 
 CREATE UNIQUE INDEX index_author_names ON authors (name_last, name_first, year);
-
-CREATE TYPE event_type AS ENUM (
-    'finished', 'reading', 'aborted', 'purchased',
-    'pre-ordered', 'wished-for'
-);
 
 CREATE TABLE events (
     event_id SERIAL PRIMARY KEY,

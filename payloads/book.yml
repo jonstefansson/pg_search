@@ -1,29 +1,27 @@
-# finished
-# reading    
-# aborted    
-# purchased  
-# pre-ordered
-# wished-for 
 ---
+# finished     reading       aborted
+# purchased    pre-ordered   wished-for
 - book:
     book_id:
     title: >-
-      My Darkest Prayer
+      Lost Man's Lane
     title_full: >-
-      My Darkest Prayer
+      Lost Man's Lane
     tags:
       - Fiction
-      - Mystery
       - Thriller
+      - Mystery
+      - rattlesnake
+    status: finished
     series_rank:
-    year: 2019
+    year: 2024
   authors:
     - author_id:
-      name_first: S.A.
-      name_last: Cosby
-      year: 1973
+      name_first: Scott
+      name_last: Carson
+      year: 1982
   event:
     event_id:
     book_id:
     event: finished
-    created_at: 2020-07-06T12:00:00
+    created_at: 2024-08-03T21:30:00

@@ -9,10 +9,10 @@ class Book:
     title: str
     title_full: str
     tags: list[str]
-    authors: list['Author'] = field(default_factory=list)
-    last_event: 'Event' = None
+    status: str
     series_rank: int = 0
     year: int = 0
+    authors: list['Author'] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data):
@@ -21,6 +21,7 @@ class Book:
             title=data['title'],
             title_full=data['title_full'],
             tags=data['tags'],
+            status=data['status'],
             series_rank=data['series_rank'],
             year=data['year']
         )
@@ -62,11 +63,11 @@ class Book:
                     title=record[1],
                     title_full=record[2],
                     tags=record[3],
-                    series_rank=record[4],
-                    year=record[5]
+                    status=record[4],
+                    series_rank=record[5],
+                    year=record[6]
                 )
                 book.authors = [author for author in Author.book_authors(ctx, book_id)]
-                book.last_event = Event.last_event(ctx, book_id)
         return book
 
     @classmethod
@@ -74,7 +75,7 @@ class Book:
         conn = ctx.obj['db'].get_connection()
         with conn.execute(
             """
-            SELECT book_id, title, title_full, tags, series_rank
+            SELECT book_id, title, title_full, tags, status, series_rank, year
             FROM books
             WHERE title = %s AND year = %s;
             """,
@@ -85,14 +86,14 @@ class Book:
             return cls(*record)
         with conn.execute(
             """
-            INSERT INTO books (title, title_full, tags, series_rank, year)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO books (title, title_full, tags, status, series_rank, year)
+            VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING book_id
             """,
-            (book.title, book.title_full, book.tags, book.series_rank, book.year)
+            (book.title, book.title_full, book.tags, book.status, book.series_rank, book.year)
         ) as cur:
             book_id = cur.fetchone()[0]
-            book = cls(book_id, book.title, book.title_full, book.tags, book.series_rank)
+            book = cls(book_id, book.title, book.title_full, book.tags, book.status, book.series_rank)
             conn.commit()
             return book
 
@@ -151,3 +152,25 @@ class Book:
         ) as cur:
             for record_tuple in cur:
                 yield record_tuple
+
+    @staticmethod
+    def update_status(ctx, book_id: int, status: str):
+        """
+        Updates the status of a book.
+
+        :param ctx: dict -- the click context
+        :param book_id: int -- the book_id
+        :param status: str -- the status
+        :return:
+        """
+        conn = ctx.obj['db'].get_connection()
+        conn.execute(
+            """
+            UPDATE books
+            SET status = %s
+            WHERE book_id = %s
+            """,
+            (status, book_id)
+        )
+        conn.commit()
+        logging.getLogger('pg_search.models.book').info(f"update_status -- book_id: {book_id}, status: {status}")
