@@ -2,7 +2,7 @@ SELECT books.book_id,
        books.title,
        books.year,
        books.series_rank,
-       string_agg((authors.name_last || ', ' || authors.name_first), ', ') as author,
+       array_agg(format('%%s, %%s', authors.name_last, authors.name_first)) as author,
        books.tags
 FROM books
 LEFT JOIN book_authors ON books.book_id = book_authors.book_id
