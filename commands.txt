@@ -13,4 +13,5 @@ type mypsql
 declare -f mypsql
 
 pg_dump --host=localhost --username=boston --verbose --format=c pgsearch > pg_search_backup.dump
+cp pg_search_backup.dump /Users/jonstefansson/Library/Mobile Documents/com~apple~CloudDocs/Documents/Personal/backups/pg_search
 pg_restore --host=localhost --username=boston --verbose --clean --dbname=pgsearch pg_search_backup.dump
