@@ -63,6 +63,16 @@ AFTER UPDATE ON authors
 FOR EACH ROW EXECUTE FUNCTION update_authors_searchable();
 ```
 
+## Updating Tags
+
+Values for an array column are expressed as a string containing values in curly brackets.
+
+```sql
+begin;
+update books set tags = '{Thriller,Legal,Crime,"Rene Ballard",kindle}' where book_id = 50;
+commit;
+```
+
 ## Commands
 
 * db add-event         Adds an event to the database.

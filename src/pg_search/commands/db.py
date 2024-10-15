@@ -200,8 +200,8 @@ def search(ctx, query, query_parser):
         'title',
         'year',
         'series_rank',
-        'author',
-        'tags'
+        'status',
+        'author'
     ]))
 
 
