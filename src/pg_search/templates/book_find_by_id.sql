@@ -1,4 +1,4 @@
-SELECT book_id,
+SELECT id,
        title,
        title_full,
        tags,
@@ -7,4 +7,4 @@ SELECT book_id,
        year,
        searchable
 FROM books
-WHERE book_id = %s;
+WHERE id = %s;

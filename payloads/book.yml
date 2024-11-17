@@ -4,24 +4,26 @@
 - book:
     book_id:
     title: >-
-      Lost Man's Lane
+      Lucky Loser
     title_full: >-
-      Lost Man's Lane
+      Lucky Loser: How Donald Trump Squandered His Father's Fortune and Created the Illusion of Success
     tags:
-      - Fiction
-      - Thriller
-      - Mystery
-      - rattlesnake
-    status: finished
+      - nonfiction
+      - politics
     series_rank:
+    status: purchased
     year: 2024
   authors:
     - author_id:
-      name_first: Scott
-      name_last: Carson
-      year: 1982
+      name_first: Russ
+      name_last: Buettner
+      year: 1973
+    - author_id:
+      name_first: Susanne
+      name_last: Craig
+      year: 1973
   event:
     event_id:
     book_id:
-    event: finished
-    created_at: 2024-08-03T21:30:00
+    event: purchased
+    created_at: 2024-10-01
