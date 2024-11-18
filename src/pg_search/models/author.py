@@ -4,7 +4,7 @@ from ..support import get_template
 
 @dataclass
 class Author:
-    author_id: int
+    id: int
     name_first: str
     name_last: str
     year: int = field(default=0)
@@ -12,7 +12,7 @@ class Author:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            author_id=data['author_id'],
+            id=data['id'],
             name_first=data['name_first'],
             name_last=data['name_last'],
             year=data['year']
@@ -33,7 +33,7 @@ class Author:
         conn = ctx.obj['db'].get_connection()
         with conn.execute(
             """
-            SELECT author_id, name_last, name_first, year
+            SELECT id, name_last, name_first, year
             FROM authors
             WHERE name_last = %s AND name_first = %s AND year = %s;
             """,
@@ -47,7 +47,7 @@ class Author:
                     """
                     INSERT INTO authors (name_last, name_first, year)
                     VALUES (%s, %s, %s)
-                    RETURNING author_id
+                    RETURNING id
                     """,
                     (author.name_last, author.name_first, author.year)
                 )

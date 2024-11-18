@@ -1,11 +1,13 @@
 import logging
+
 import click
-import yaml
+import json
 from pg_search.services.yaml_loader import load_yaml
 from pg_search.database import DatabaseConnection, Query
 from ..models import Book, Event, EventEnum
 from ..support import get_template, safe_parse
 from dataclasses import asdict
+from ..support.json import CustomJsonEncoder
 
 
 @click.group()
@@ -39,7 +41,7 @@ def find_book_by_id(ctx, book_id):
     """
     book = Book.find_by_id(ctx, book_id)
     if book is not None:
-        click.echo(yaml.dump(asdict(book)))
+        click.echo(json.dumps(asdict(book), cls=CustomJsonEncoder))
     else:
         click.secho(f"Book {book_id} not found", err=True, fg='red')
 
@@ -80,7 +82,7 @@ def insert_books(ctx, yml_input):
         result = Book.insert_book(ctx, data_dict)
         ctx.obj['db'].get_connection().commit()
         logging.getLogger('pg_search.db').info('transaction committed')
-        click.echo(yaml.dump(result))
+        click.echo(json.dumps(result, cls=CustomJsonEncoder))
 
 
 @db_cli.command('prepare')
@@ -155,7 +157,7 @@ def add_event(ctx, book_id, event, created_at):
         ctx,
         event=Event.from_dict(
             dict(
-                event_id=None,
+                id=None,
                 book_id=book_id,
                 event=event,
                 created_at=safe_parse(created_at)

@@ -17,7 +17,7 @@ class EventEnum(StrEnum):
 
 @dataclass
 class Event:
-    event_id: int
+    id: int
     book_id: int
     event: str
     created_at: datetime
@@ -25,7 +25,7 @@ class Event:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            event_id=data['event_id'],
+            id=data['id'],
             book_id=data['book_id'],
             event=data['event'],
             created_at=safe_parse(data['created_at'])
@@ -53,11 +53,11 @@ class Event:
                 )
             )
         ) as cur:
-            event_id, book_id = cur.fetchone()
+            id, book_id = cur.fetchone()
         conn.commit()
 
-        logging.getLogger('pg_search.models.event').info(f"insert event -- event_id: {event_id}")
-        return cls(event_id, book_id, event.event, event.created_at)
+        logging.getLogger('pg_search.models.event').info(f"insert event -- event id: {id}")
+        return cls(id, book_id, event.event, event.created_at)
 
     @classmethod
     def last_event(cls, ctx, book_id) -> 'Event':

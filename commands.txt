@@ -1,13 +1,13 @@
-poetry run db insert-books payloads/book.yml
-poetry run db search 'winspear'
-poetry run db search 'winspear -dobbs'
-poetry run db search '"winspear jacqueline" -"Maisie Dobbs"'
-poetry run db find-book 128
-poetry run db build-searchable 130
-poetry run db add-event -i 128 -e 'finished' -c '2024-06-23'
-poetry run db reindex
-poetry run db prepare payloads/dobbs.yml > payloads/temp.yml
-poetry run db book-status reading
+db insert-books payloads/book.yml
+db search 'winspear'
+db search 'winspear -dobbs'
+db search '"winspear jacqueline" -"Maisie Dobbs"'
+db find-book 128
+db build-searchable 130
+db add-event -i 128 -e 'finished' -c '2024-06-23'
+db reindex
+db prepare payloads/dobbs.yml > payloads/temp.yml
+db book-status reading
 
 type mypsql
 declare -f mypsql
