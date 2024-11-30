@@ -58,7 +58,7 @@ def authors(ctx):
     conn = ctx.obj['db'].get_connection()
     with conn.execute(
         """
-        SELECT author_id, name_last, name_first
+        SELECT id, name_last, name_first
         FROM authors
         """
     ) as cur:
