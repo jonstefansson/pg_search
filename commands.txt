@@ -1,13 +1,21 @@
 db insert-books payloads/book.yml
+
 db search 'winspear'
 db search 'winspear -dobbs'
 db search '"winspear jacqueline" -"Maisie Dobbs"'
+db search -s wished-for winspear
+db search --status finished winspear
+
 db find-book 128
 db build-searchable 130
 db add-event -i 128 -e 'finished' -c '2024-06-23'
 db reindex
 db prepare payloads/dobbs.yml > payloads/temp.yml
 db book-status reading
+
+# render template content for debugging purposes
+tools template temp.json
+pbpaste | tools template -
 
 type mypsql
 declare -f mypsql

@@ -184,19 +184,21 @@ def add_event(ctx, book_id, event, created_at):
         ]
     )
 )
+@click.option('-s', '--status', 'status', required=False, default='ALL', type=click.Choice(['ALL'] + [str(i) for i in EventEnum]))
 @click.argument('query', required=True, type=click.STRING)
 @click.pass_context
-def search(ctx, query, query_parser):
+def search(ctx, status, query, query_parser):
     """
     Full-text search for books and authors.
 
     :param ctx: dict -- the click context
+    :param status: str -- the status enum
     :param query: str -- the search query
     :param query_parser: str -- the query parser
     :return:
     """
     from tabulate import tabulate
-    book_tuples = [book_tuple for book_tuple in Book.search(ctx, query, query_parser)]
+    book_tuples = [book_tuple for book_tuple in Book.search(ctx, status, query, query_parser)]
     click.echo(tabulate(book_tuples, headers=[
         'book_id',
         'title',
