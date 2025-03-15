@@ -6,9 +6,9 @@ db search '"winspear jacqueline" -"Maisie Dobbs"'
 db search -s wished-for winspear
 db search --status finished winspear
 
-db find-book 128
-db build-searchable 130
-db add-event -i 128 -e 'finished' -c '2024-06-23'
+db find-book 256
+db build-searchable 255
+db add-event -i 256 -e 'reading' -c '2025-02-01'
 db reindex
 db prepare payloads/dobbs.yml > payloads/temp.yml
 db book-status reading
