@@ -1,6 +1,6 @@
 import logging
 from enum import StrEnum
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime
 from pg_search.support.date import safe_parse, current_timestamp_callable
 from ..support import get_template

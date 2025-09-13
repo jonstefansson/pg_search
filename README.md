@@ -69,18 +69,21 @@ Values for an array column are expressed as a string containing values in curly 
 
 ```sql
 begin;
-update books set tags = '{Thriller,Legal,Crime,"Rene Ballard",kindle}' where book_id = 50;
+update books set tags = '{fiction,thriller,spy,"Gabriel Allon",kindle}'
+where id = 257;
 commit;
 ```
 
 ## Commands
 
-* db add-event         Adds an event to the database.
-* db authors           Lists authors in the database.
-* db book-status       Lists books with status pass as argument
-* db build-searchable  Updates the searchable column for a book.
-* db find-book         Finds a book by its book_id.
-* db insert-books      Inserts one or more books in yml_input in the form of...
-* db prepare           This function takes a flat yaml file containing book...
-* db reindex           Rebuilds the idx_searchable_book index.
-* db search            Full-text search for books and authors.
+* poetry run db add-event         Adds an event to the database.
+* poetry run db add-event -i 273 -e reading -c 2025-09-05
+* poetry run db authors           Lists authors in the database.
+* poetry run db book-status       Lists books with status passed as argument
+* poetry run db build-searchable  Updates the searchable column for a book.
+* poetry run db find-book         Finds a book by its book_id.
+* poetry run db insert-books      Inserts one or more books in yml_input in the form of...
+* poetry run db prepare           This function takes a flat yaml file containing book...
+* poetry run db reindex           Rebuilds the idx_searchable_book index.
+* poetry run db search            Full-text search for books and authors.
+* poetry run db book-activity 77  Gets list of activities for book_id

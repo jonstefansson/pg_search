@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass, field, asdict
 from ..support import get_template
+from .event import Event
 
 
 @dataclass
@@ -13,6 +14,19 @@ class Book:
     series_rank: int = 0
     year: int = 0
     authors: list['Author'] = field(default_factory=list)
+
+    @classmethod
+    def activity(cls, ctx, book_id):
+        book = cls.find_by_id(ctx, book_id)
+        template = get_template('event_history.sql')
+        conn = ctx.obj['db'].get_connection()
+        with conn.execute(
+            template.render(),
+                (book_id,)
+        ) as cur:
+            results = cur.fetchall()
+            events = [Event(*e) for e in results]
+        return book, events
 
     @classmethod
     def from_dict(cls, data):
@@ -48,7 +62,7 @@ class Book:
 
     @classmethod
     def find_by_id(cls, ctx, id):
-        from ..models import Author, Event
+        from ..models import Author
         book = None
         template = get_template('book_find_by_id.sql')
         conn = ctx.obj['db'].get_connection()

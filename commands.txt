@@ -1,17 +1,31 @@
 db insert-books payloads/book.yml
 
 db search 'winspear'
+db search 'cj box'
 db search 'winspear -dobbs'
 db search '"winspear jacqueline" -"Maisie Dobbs"'
 db search -s wished-for winspear
 db search --status finished winspear
 
-db find-book 256
-db build-searchable 255
-db add-event -i 256 -e 'reading' -c '2025-02-01'
+db find-book 319
+db find-book 319 2> /dev/null| jq '.'
+db build-searchable 50
+
+# finished     reading       aborted
+# purchased    pre-ordered   wished-for
+
+db add-event -i 256 -e 'aborted' -c '2025-04-30'
+db add-event -i 261 -e 'finished' -c '2025-05-10'
+db add-event -i 257 -e 'finished' -c '2025-08-14'
+db add-event -i 259 -e 'purchased' -c '2025-07-05'
+
 db reindex
 db prepare payloads/dobbs.yml > payloads/temp.yml
 db book-status reading
+db insert-books payloads/book.yml
+
+# Get list of events for a book
+db book-activity 77 | jq '.'
 
 # render template content for debugging purposes
 tools template temp.json

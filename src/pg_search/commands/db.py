@@ -28,6 +28,24 @@ def db_cli(ctx):
         logging.getLogger('pg_search.db').info('database connection closed')
 
 
+@db_cli.command('book-activity')
+@click.pass_context
+@click.argument('book_id', type=click.INT, required=True)
+def book_activity(ctx, book_id):
+    """
+    Show event history of a book.
+
+    :param ctx:
+    :param book_id:
+    :return:
+    """
+    book, events = Book.activity(ctx, book_id)
+    result = dict(
+        book=asdict(book),
+        events=[asdict(e) for e in events]
+    )
+    click.echo(json.dumps(result, cls=CustomJsonEncoder))
+
 @db_cli.command('find-book')
 @click.pass_context
 @click.argument('book_id', required=True, type=click.INT)
@@ -214,7 +232,7 @@ def search(ctx, status, query, query_parser):
 @click.pass_context
 def book_status(ctx, status):
     """
-    Lists books with status pass as argument.
+    Lists books with status passed as argument.
 
     :param ctx:
     :param status:
