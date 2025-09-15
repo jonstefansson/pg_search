@@ -251,7 +251,7 @@ def book_status(ctx, status):
         tabulate(results, headers=[
             'book_id',
             'title',
-            'authors',
             'status',
+            'authors',
             'created_at'
         ]))

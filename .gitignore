@@ -2,3 +2,7 @@
 **/__pycache__/
 payloads/temp.yml
 pg_search_backup.dump
+.DS_Store
+mypsql
+temp*
+/pg_search
